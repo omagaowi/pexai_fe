@@ -60,11 +60,13 @@ const PhotoDetailsPage = () => {
 
   const query = useQueryParams();
 
+  console.log(activeImage)
+
   const toggleSaveImageMutataion = useMutation({
     mutationKey: ["collection", "toggle"],
     mutationFn: () => {
       return axios.get(
-        `${root_uri}/collections/${userData.user_id}/photos/${id}/toggle`,
+        `${root_uri}/collections/${userData.user_id}/photos/${id}/toggle?thumbnail=${ activeImage.src.large }`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -84,7 +86,7 @@ const PhotoDetailsPage = () => {
   const toggleLikeImageMutataion = useMutation({
     mutationKey: ["collection", "like"],
     mutationFn: () => {
-      return axios.get(`${root_uri}/likes/photos/${id}/toggle`, {
+      return axios.get(`${root_uri}/likes/photos/${id}/toggle?thumbnail=${ activeImage.src.large }`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -93,16 +95,11 @@ const PhotoDetailsPage = () => {
     onMutate: () => {
       // setIsLoading(true)
     },
-    onSuccess: (data) => {
- 
-    },
+    onSuccess: (data) => {},
     onError: (error) => {
- 
       // setIsLoading(true)
     },
   });
-
- 
 
   const getImageMutation = useMutation({
     mutationKey: mutationKey,
@@ -208,12 +205,16 @@ const PhotoDetailsPage = () => {
                 <div className="flex flex-wrap items-start max-[830px]:mt-[10px] mt-[20px] text-[14px] text-[gray]">
                   <h3 className="">Photo by {activeImage.photographer}</h3>
                   <a
-                    href={activeImage.photographer_url}
+                    href={activeImage.origin == 'pexels'? activeImage.photographer_url : `https://unsplash.com/@${ activeImage.photographer_username }` }
                     target="_blank"
                     className="flex hover:underline ml-[5px] items-center"
                   >
-                    (View on Pexels{" "}
-                    <ExternalLink size={12} className="ml-[4px]" /> )
+                    {activeImage.origin == "pexels" ? (
+                      <>{`(View on Pexels`}</>
+                    ) : (
+                      <>{`(View on Unsplash`}</>
+                    )}
+                    <ExternalLink size={12} className="ml-[4px]" /> {`)`}
                   </a>
                 </div>
                 <div className="max-[830px]:mt-[16px] mt-[30px] flex">

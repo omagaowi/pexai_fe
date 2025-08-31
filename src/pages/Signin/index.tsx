@@ -47,7 +47,7 @@ const SigninPage = () => {
     mutationKey: ["signInKey"],
     mutationFn: () => {
       return axios.get(
-        `${root_uri}/api/v1/auth/signin?code=${query.get("code")}`
+        `${root_uri}/auth/signin?code=${query.get("code")}`
       );
     },
     onSuccess: (data) => {

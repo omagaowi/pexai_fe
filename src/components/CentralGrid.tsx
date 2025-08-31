@@ -18,11 +18,25 @@ import CircularLoader from "./LoaderCircular";
 import useAuth, { root_uri } from "@/utils/stores/aurhStore";
 
 interface CentralGridProps {
-  url: string;
+  appPage: string,
+  mutationKey: Array<string>,
+  api_url: string
   parent: any
 }
 
-const CentralGrid: React.FC<CentralGridProps> = ({ url, parent }) => {
+function filterDuplicates<T>(array: T[], field: keyof T): T[] {
+  const seen = new Set();
+  return array.filter(item => {
+    const value = item[field];
+    if (seen.has(value)) {
+      return false;
+    }
+    seen.add(value);
+    return true;
+  });
+}
+
+const CentralGrid: React.FC<CentralGridProps> = ({ api_url, appPage, mutationKey, parent }) => {
   const { width } = useViewDimensions();
   const appContainerRef = parent;
   const { containerSize } = useContainerSize(appContainerRef);
@@ -35,34 +49,36 @@ const CentralGrid: React.FC<CentralGridProps> = ({ url, parent }) => {
 
   const [searchQuery, setSearchQuery] = useState<string>("old garden");
 
+  
+
   const queryClient = useQueryClient();
 
-  const mutationKey = ["images", "home"];
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const [photos, setPhotos] = useState([]);
   const [nextLoading, setNextLoading] = useState(false)
 
-  console.log(photos)
+ 
 
   const getAllImagesMutation = useMutation({
     mutationKey: mutationKey,
     mutationFn: (page_no: number) => {
-      return axios.get(`${ root_uri }/images/all?page=${ 1 }`, {
+      return axios.get(`${ api_url }?page=${ page_no }`, {
         headers: {
           'Authorization': `Bearer ${ accessToken }`
         }
       });
     },
     onSuccess: (data) => {
-      setPhotos([...photos, ...data.data]);
+      const fetchedPhotos  = appPage == 'collection' || appPage == 'likes'? data.data.allPhotos : data.data
+      setPhotos(filterDuplicates([...photos, ...fetchedPhotos], 'pexai_id'));
       setIsLoading(false);
       setNextLoading(false)
       setPage(prev => prev + 1)
     },
     onError: (error) => {
- 
+      console.log(error)
       // setIsLoading(true)
     },
   });
@@ -70,12 +86,12 @@ const CentralGrid: React.FC<CentralGridProps> = ({ url, parent }) => {
  
 
   const fetchMorePhotos = (page_no : number) => {
-    // console.log('next')
+ 
     if(photos.length > 0){
     setNextLoading(true)
     }
-    console.log('fetch')
-    getAllImagesMutation.mutate(page);
+ 
+    getAllImagesMutation.mutate(page_no);
   };
 
   // const { photos, isLoading, error, fetchMorePhotos } = usePhotoFetching(
@@ -106,7 +122,7 @@ const CentralGrid: React.FC<CentralGridProps> = ({ url, parent }) => {
         scrollHeight - scrollTop - clientHeight < clientHeight * 0.5 &&
         !nextLoading
       ) {
-        console.log('load')
+ 
         fetchMorePhotos(page);
       }
     }
@@ -151,9 +167,10 @@ const CentralGrid: React.FC<CentralGridProps> = ({ url, parent }) => {
         scrollTop={scrollPosition}
         onNeedMore={() => {
           if(!nextLoading){
+ 
             fetchMorePhotos(1)
           }
-          // console.log('next')
+ 
           //  setIsLoading(true)
         }}
         isLoading={isLoading}

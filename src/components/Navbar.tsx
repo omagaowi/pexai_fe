@@ -19,9 +19,12 @@ import {
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import { useMutationState } from "@tanstack/react-query";
 import CircularLoader from "./LoaderCircular";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { accessToken, userData } = useAuth();
+
+  const navigate = useNavigate()
 
   const mutationKey = ["user"];
 
@@ -43,9 +46,9 @@ const Navbar = () => {
 
   return (
     <div className="w-full h-[80px] bg-[#fff] z-9999 fixed flex navbar justify-between items-center border-b-[1px] border-[#f2f2f2]">
-      <div className="w-[105px] ml-[15px]">
+      <Link to={`/`} className="w-[105px] ml-[15px]">
         <img src="/assets/logo/logo1.png" className="w-full" />
-      </div>
+      </Link>
       <div className="flex-1 flex items-center justify-center h-full">
         <div className="max-w-[540px] flex items-center h-[55px] rounded-lg nav-search bg-[#f5f5f5] w-[90%]">
           {/* <div className="w-[50px] flex items-center justify-center h-[50px] mx-[5px] rounded-lg bg-[#fff] shadow-xsm">
@@ -121,11 +124,15 @@ const Navbar = () => {
                       <Shuffle size={19} className="mx-[10px]" />
                       <p className="text-[13px]">My Remixes</p>
                     </li>
-                    <li className="w-[95%] h-[43px] rounded-md  my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center">
+                    <li className="w-[95%] h-[43px] rounded-md  my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center" onClick={ () => {
+                      navigate(`/collections`)
+                    } }>
                       <Layers size={19} className="mx-[10px]" />
                       <p className="text-[13px]">My Collections</p>
                     </li>
-                    <li className="w-[95%] h-[43px] rounded-md  my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center">
+                    <li className="w-[95%] h-[43px] rounded-md  my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center" onClick={ () => {
+                      navigate(`/likes`)
+                    } }>
                       <Heart size={19} className="mx-[10px]" />
                       <p className="text-[13px]">Liked Photos</p>
                     </li>
