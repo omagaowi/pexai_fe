@@ -16,6 +16,9 @@ import AllCollectionsPage from "./pages/AllCollections";
 import ViewCollectionPage from "./pages/ViewCollection";
 import AllLikesPage from "./pages/AllLikes";
 import RemixPage from "./pages/Remix";
+import FileInput from "./utils/useFiles";
+import SelectedImages from "./components/SelectedImages";
+import MotionTest from "./pages/MotionTest";
 
 function App() {
   const mutationKey = ["user"];
@@ -58,11 +61,14 @@ function App() {
           <Route path="/likes" element={<AllLikesPage />} />
           <Route path="/auth/signin" element={<SigninPage />} />
            <Route path="/remix" element={<RemixPage />} />
+            <Route path="/motion" element={<MotionTest />} />
         </Routes>
       </BrowserRouter>
       {/* </QueryClientProvider> */}
       <Modal />
       <Toaster />
+      <SelectedImages />
+      <FileInput id={ `files_input` }/>
     </div>
   );
 }
