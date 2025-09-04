@@ -8,7 +8,7 @@ interface SelectedStore {
 }
 
 const useSelectedStore = create<SelectedStore>((set) => ({
-  isOpen: true,
+  isOpen: false,
   setIsOpen: (data: boolean) => set(() => ({ isOpen: data })),
   isExpand: false,
   setIsExpand: (data: boolean) => set(() => ({ isExpand: data })),

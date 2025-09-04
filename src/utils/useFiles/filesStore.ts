@@ -1,13 +1,6 @@
 import { create } from "zustand";
 
-export interface FileType {
-  file: File;
-  status: string;
-  error: any;
-  url: string;
-  file_id: string;
-  other: any;
-}
+import { FileType } from "./fileUtils";
 
 export interface ProgressType {
   file_id: string;
