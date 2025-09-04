@@ -3,10 +3,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useFileUpload } from "@/utils/useFiles/fileUtils";
 import { Paperclip, Plus, Send } from "lucide-react";
 import React from "react";
 
 const MessageBox = () => {
+
+  const { files } = useFileUpload()
+
+  console.log(files)
+
   return (
     <div className="absolute bottom-[20px] flex flex-col rounded-md border-[1px] bg-[#fff] border-[#f0f0f0] w-full h-[150px] shadow-sm">
       <div className="max-w-[200px] ml-[10px] w-[95%] overflow-y-hidden no-scrollbar h-[50px] items-end flex">

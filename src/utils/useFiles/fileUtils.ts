@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import fileStore from "./filesStore";
+import { tryCatch } from "../tryCatch";
 
 const pinata_token = import.meta.env.VITE_PINATA_AUTH_TOKEN;
 const pinata_gateway_url = import.meta.env.VITE_PINATA_GATEWAY_URL;
@@ -14,11 +15,13 @@ export type FileStatus =
   | "cancelled";
 
 export interface FileType {
-  file: File;
+  file: File | boolean;
   file_id: string;
-  status: FileStatus;
+  status: string;
   url?: string | false;
   error?: any;
+  upload_id: string;
+  thumbnail_url: string | false
 }
 
 export interface ProgressType {
@@ -31,7 +34,19 @@ export interface ControllerType {
   controller: AbortController;
 }
 
-export const useFileUpload = () => {
+export interface UseFileUploadReturn {
+  files: Array<FileType>;
+  progress: Array<ProgressType>;
+  setFiles: (files: Array<FileType>) => void;
+  uploadFile: (file: FileType) => void;
+  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  deleteFile: (upload_id: string, file_id: string) => Promise<string>;
+  removeFile: (file_id: string) => void;
+  getProgress: (file_id: string) => ProgressType | false;
+  addFile: (file: FileType) => void;
+}
+
+export const useFileUpload = (): UseFileUploadReturn => {
   const {
     files,
     setFiles,
@@ -118,14 +133,18 @@ export const useFileUpload = () => {
       return el.file_id == file.file_id;
     });
     uploadData(dummyProgress, formData, thisController.controller, file.file_id)
-      .then((data) => {
-        getURI(data)
+      .then((data: any) => {
+        getURI(data.data.data)
           .then((result) => {
             const dummyFiles = [...files];
             const thisFile = dummyFiles.find(function (el: FileType) {
               return el.file_id == file.file_id;
             });
             dummyFiles[dummyFiles.indexOf(thisFile)].status = "uploaded";
+            dummyFiles[dummyFiles.indexOf(thisFile)].url = result.data;
+            dummyFiles[dummyFiles.indexOf(thisFile)].thumbnail_url = result.data;
+            dummyFiles[dummyFiles.indexOf(thisFile)].upload_id =
+              data.data.data.cid;
             setFiles(dummyFiles);
           })
           .catch((error) => {
@@ -159,6 +178,49 @@ export const useFileUpload = () => {
       });
   };
 
+  const getProgress = (file_id: string) => {
+    const thisProgress = progress.find(function (el) {
+      return el.file_id == file_id;
+    });
+    return thisProgress || false;
+  };
+
+  const removeFile = (file_id: string) => {
+ 
+
+    const newFiles = [...files].filter(function (el) {
+      return el.file_id != file_id;
+    });
+ 
+    setFiles(newFiles);
+  };
+
+  const addFile = (file: FileType) => {
+    const dummyFiles = [...files, file];
+    setFiles(dummyFiles);
+  };
+
+  const deleteFile = async (
+    upload_id: string,
+    file_id: string
+  ): Promise<string> => {
+    const url = `https://api.pinata.cloud/v3/files/${upload_id}`;
+    const { data: deleteData, error: deleteError } = await tryCatch(
+      axios.delete(url, {
+        headers: {
+          Authorization: `Bearer ${pinata_token}`,
+        },
+      })
+    );
+
+    if (deleteError) {
+      throw deleteError;
+    }
+
+    removeFile(file_id);
+
+    return "success";
+  };
   useEffect(() => {
     files.forEach((file) => {
       if (file.status == "pending") {
@@ -182,8 +244,10 @@ export const useFileUpload = () => {
         status: "pending",
         error: false,
         url: false,
+        upload_id: "",
         file_id: file_id,
         other: false,
+        thumbnail_url: false
       });
       newProgress.push({
         file_id: file_id,
@@ -205,5 +269,9 @@ export const useFileUpload = () => {
     setFiles,
     uploadFile,
     handleFileChange,
+    deleteFile,
+    removeFile,
+    getProgress,
+    addFile,
   };
 };
