@@ -21,7 +21,7 @@ export interface FileType {
   url?: string | false;
   error?: any;
   upload_id: string;
-  thumbnail_url: string | false
+  thumbnail_url: string | false;
 }
 
 export interface ProgressType {
@@ -42,7 +42,7 @@ export interface UseFileUploadReturn {
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   deleteFile: (upload_id: string, file_id: string) => Promise<string>;
   removeFile: (file_id: string) => void;
-  getProgress: (file_id: string) => ProgressType | false;
+  getProgress: (file_id: string) => ProgressType | any;
   addFile: (file: FileType) => void;
 }
 
@@ -142,9 +142,18 @@ export const useFileUpload = (): UseFileUploadReturn => {
             });
             dummyFiles[dummyFiles.indexOf(thisFile)].status = "uploaded";
             dummyFiles[dummyFiles.indexOf(thisFile)].url = result.data;
-            dummyFiles[dummyFiles.indexOf(thisFile)].thumbnail_url = result.data;
+            dummyFiles[dummyFiles.indexOf(thisFile)].thumbnail_url =
+              result.data;
             dummyFiles[dummyFiles.indexOf(thisFile)].upload_id =
               data.data.data.cid;
+            sessionStorage.setItem(
+              "files",
+              JSON.stringify(
+                dummyFiles.filter(function (el) {
+                  return el.status == "uploaded";
+                })
+              )
+            );
             setFiles(dummyFiles);
           })
           .catch((error) => {
@@ -185,20 +194,37 @@ export const useFileUpload = (): UseFileUploadReturn => {
     return thisProgress || false;
   };
 
-  const removeFile = (file_id: string) => {
- 
 
+  const removeFile = (file_id: string) => {
     const newFiles = [...files].filter(function (el) {
       return el.file_id != file_id;
     });
- 
+    sessionStorage.setItem(
+      "files",
+      JSON.stringify(
+        newFiles.filter(function (el) {
+          return el.status == "uploaded";
+        })
+      )
+    );
     setFiles(newFiles);
   };
 
   const addFile = (file: FileType) => {
+//    console.log(file)
     const dummyFiles = [...files, file];
+    sessionStorage.setItem(
+      "files",
+      JSON.stringify(
+        dummyFiles.filter(function (el) {
+          return el.status == "uploaded";
+        })
+      )
+    );
     setFiles(dummyFiles);
   };
+
+//  console.log(files)
 
   const deleteFile = async (
     upload_id: string,
@@ -229,6 +255,9 @@ export const useFileUpload = (): UseFileUploadReturn => {
       } else {
       }
     });
+    if(files.length ==  0){
+      sessionStorage.setItem('files', JSON.stringify([]))
+    }
   }, [files]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -247,7 +276,7 @@ export const useFileUpload = (): UseFileUploadReturn => {
         upload_id: "",
         file_id: file_id,
         other: false,
-        thumbnail_url: false
+        thumbnail_url: false,
       });
       newProgress.push({
         file_id: file_id,
@@ -259,6 +288,14 @@ export const useFileUpload = (): UseFileUploadReturn => {
         controller: controller,
       });
     }
+    sessionStorage.setItem(
+      "files",
+      JSON.stringify(
+        [...files, ...newFiles].filter(function (el) {
+          return el.status == "uploaded";
+        })
+      )
+    );
     setFiles([...files, ...newFiles]);
     setProgress([...progress, ...newProgress]);
     setControllers([...controllers, ...newControllers]);

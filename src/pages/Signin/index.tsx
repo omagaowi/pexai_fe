@@ -55,7 +55,13 @@ const SigninPage = () => {
        Cookies.set('accessToken', data.data.token, { expires: 28 })
        const { token, ...user } = {...data.data }
       setUserData(user)
-      navigate(`/`)
+ 
+      if(user.membership_status == 'active'){
+        navigate(`/`)
+      }else{
+        navigate('/auth/options')
+      }
+      
     }
   });
 

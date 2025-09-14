@@ -7,6 +7,7 @@ import CollectionsGridLoading from "./CollectionsGridLoading";
 import useAuth, { root_uri } from "@/utils/stores/aurhStore";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
 
 const AllCollectionsPage = () => {
   const parentRef = useRef<HTMLDivElement | null>(null);
@@ -51,8 +52,18 @@ const AllCollectionsPage = () => {
           </>
         ) : (
           <>
-            {!getCollectionsMutation.data? (
-              <></>
+            {!getCollectionsMutation.data ? (
+               <div className="absolute top-[50%] left-[50%] flex flex-col items-center justify-center translate-x-[-50%] translate-y-[-50%]">
+                An Error Occured
+                <Button
+                  className="w-[90px] cursor-pointer mt-[10px] text-[14px] h-[40px]"
+                  onClick={() => {
+                    getCollectionsMutation.mutate();
+                  }}
+                >
+                  Retry
+                </Button>
+              </div>
             ) : (
               <div
                 className={`w-full h-fit px-[20px] mt-[20px] mb-[20px] ${
@@ -62,7 +73,7 @@ const AllCollectionsPage = () => {
                 }`}
               >
                 {getCollectionsMutation.data.data.map((collection) => (
-                  <CollectionCard collection = { collection }/>
+                  <CollectionCard collection={collection} />
                 ))}
               </div>
             )}

@@ -9,8 +9,8 @@ const OnClickOutside = ({ children, currentState, setState }) => {
 
     const handleClickOut = (event) => {
         if (clickOutRef.current && !clickOutRef.current.contains(event.target)) {
-            console.log('clicked out')
-            console.log(currentStateRef.current); // Use the ref to get the latest value
+//            console.log('clicked out')
+//            console.log(currentStateRef.current); // Use the ref to get the latest value
             if (currentStateRef.current) {
               setState(false); // Update state
             }

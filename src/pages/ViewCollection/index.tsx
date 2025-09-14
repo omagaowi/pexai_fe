@@ -30,7 +30,7 @@ const ViewCollectionPage = () => {
       : null;
 
 
-      console.log(collectionLatest?.data)
+      // console.log(collectionLatest?.data)
  
 
 //   useEffect(() => {

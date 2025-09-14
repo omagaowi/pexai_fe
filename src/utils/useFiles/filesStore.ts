@@ -22,7 +22,7 @@ export interface FileStore {
 }
 
 const fileStore = create<FileStore>((set) => ({
-  files: [],
+  files: JSON.parse(sessionStorage.getItem('files')) || [],
   setFiles: (data: any) => set(() => ({ files: data })),
   progress: [],
   setProgress: (data: any) => set(() => ({ progress: data })),
