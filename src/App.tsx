@@ -205,7 +205,7 @@ function App() {
           <Route path="/auth/signin" element={<SigninPage />} />
           <Route path="/auth/options" element={ accessToken? <RemixOptions /> : <Navigate to={ '/auth/signin' }  /> } />
           <Route path="/remix" element={ accessToken? <RemixPage /> : <Navigate to={ '/auth/signin' }  /> } />
-          <Route path="/remix/:id"  element={ accessToken? <RemixPage /> : <Navigate to={ '/auth/signin' }  /> } />
+          <Route path="/remix/:id"  element={ <RemixPage /> } />
           <Route path="/remixes"  element={ accessToken? <AllRemixesPage /> : <Navigate to={ '/auth/signin' }  /> } />
           <Route path="/search" element={<SearchPage />} />
           {/* <Route path="/motion" element={<MotionTest />} /> */}

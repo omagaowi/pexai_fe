@@ -34,7 +34,7 @@ const Chat = () => {
       : null;
 
  
-
+ 
 
   return (
     <div className="max-w-[700px] relative w-[96vw] overflow-hidden h-full">
@@ -107,7 +107,7 @@ const Chat = () => {
                   <h2 className="text-[20px]">An Error Occured</h2>
                   <p className="text-[12px]">
                     {" "}
-                    {chatLatest?.error?.message ||
+                    {chatLatest?.error?.response?.data ||
                       "Unable to load conversation"}
                   </p>
                 </div>
@@ -118,7 +118,7 @@ const Chat = () => {
           )}
         </div>
       </div>
-      <MessageBox active = { id? chatLatest?.data?.data?.chat?.user_id == userData.user_id? true : false : true }/>
+      <MessageBox active = { id && chatLatest?.data? chatLatest?.data?.data?.chat?.user_id == userData.user_id? true : false : true }/>
     </div>
   );
 };

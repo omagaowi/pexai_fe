@@ -25,9 +25,11 @@ import { useMutationState } from "@tanstack/react-query";
 import CircularLoader from "./LoaderCircular";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useFileUpload } from "@/utils/useFiles/fileUtils";
 
 const Navbar = () => {
   const { accessToken, userData, setAccessToken, setUserData, setClientSocket } = useAuth();
+  const { setFiles } = useFileUpload()
 
   const navigate = useNavigate();
 
@@ -52,6 +54,8 @@ const Navbar = () => {
   const [search, setSearch] = useState(query.get("q"));
 
   const [isSearch, setIsSearch] = useState(false)
+
+ 
 
   const userLatest =
     userMutationState.length > 0
@@ -105,9 +109,9 @@ const Navbar = () => {
                 <Avatar>
                   <AvatarImage src="" />
                   <AvatarFallback>
-                    {userData ? (
-                      `${userData.first_name.split("")[0]}${
-                        userData.last_name.split("")[0]
+                    {userData && userData.first_name && userData.last_name ? (
+                      `${userData?.first_name?.split("")[0]}${
+                        userData?.last_name?.split("")[0]
                       }`
                     ) : (
                       <>
@@ -233,7 +237,10 @@ const Navbar = () => {
                   setUserData(false)
                   toast.success('Logged out!')
                   navigate('/auth/signin')
+                  localStorage.removeItem('key')
                   Cookies.remove('accessToken')
+                  setFiles([])
+                  
                 } }>
                   <LogOut size={19} className="mx-[10px]" />
                   <p className="text-[13px]">Log out</p>
@@ -242,7 +249,9 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button className="w-[90px] cursor-pointer text-[14px] h-[40px]">
+          <Button className="w-[90px] cursor-pointer text-[14px] h-[40px]" onClick={ () => {
+            navigate('/auth/signin')
+          } }>
             Sign in
           </Button>
         )}

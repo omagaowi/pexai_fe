@@ -39,6 +39,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 const PhotoDetailsPage = () => {
   const { activeImage, setActiveImage } = useImageStore();
@@ -72,8 +73,6 @@ const PhotoDetailsPage = () => {
   const page = `${id}_remixes`;
   const remixMutationKey = ["remixes", id];
   const api_url = `${root_uri}/remixes/${id}`;
-
- 
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -161,8 +160,6 @@ const PhotoDetailsPage = () => {
     setLoading(true);
     getImageMutation.mutate();
   };
-
- 
 
   useEffect(() => {
     if (!activeImage) {
@@ -328,7 +325,10 @@ const PhotoDetailsPage = () => {
                             ) : (
                               <h3 className="">
                                 Remix of photo by{" "}
-                                {  activeImage?.original_photos[0].origin != 'file'? activeImage?.original_photos[0].photographer : 'upload'}
+                                {activeImage?.original_photos[0].origin !=
+                                "file"
+                                  ? activeImage?.original_photos[0].photographer
+                                  : "upload"}
                                 {activeImage?.original_photos.length > 1 ? (
                                   <>
                                     & {activeImage?.original_photos?.length - 1}{" "}
@@ -406,25 +406,32 @@ const PhotoDetailsPage = () => {
                       <button
                         className="w-[110px] cursor-pointer h-[35px] flex items-center justify-center bg-[#1e1e1e] mr-[7px] rounded-2xl text-[#fff] text-[14px]"
                         onClick={() => {
-                          const newFile = {
-                            file: false,
-                            status: "uploaded",
-                            error: false,
-                            url:
-                              activeImage.src.large || activeImage.src.original,
-                            upload_id: "",
-                            file_id: activeImage.pexai_id,
-                            other: false,
-                            thumbnail_url:
-                              activeImage.src.small || activeImage.src.original,
-                          };
-                          if (
-                            !files.find(function (el) {
-                              return el.file_id == activeImage.pexai_id;
-                            })
-                          ) {
-                            addFile(newFile);
+                          if (accessToken) {
+                            const newFile = {
+                              file: false,
+                              status: "uploaded",
+                              error: false,
+                              url:
+                                activeImage.src.large ||
+                                activeImage.src.original,
+                              upload_id: "",
+                              file_id: activeImage.pexai_id,
+                              other: false,
+                              thumbnail_url:
+                                activeImage.src.small ||
+                                activeImage.src.original,
+                            };
+                            if (
+                              !files.find(function (el) {
+                                return el.file_id == activeImage.pexai_id;
+                              })
+                            ) {
+                              addFile(newFile);
+                            }
+                          } else {
+                            toast.warning("login to access remix");
                           }
+
                           setTimeout(() => {
                             navigate(`/remix`);
                           }, 300);
@@ -458,9 +465,13 @@ const PhotoDetailsPage = () => {
                       <button
                         className="flex items-center mr-[7px] cursor-pointer text-[#2a2a2a] transition-all duration-300  hover:border-[gray] hover:bg-[#e9e9e9] rounded-lg border-[1px] border-[#e6e6e6] justify-center w-[110px] h-[40px]"
                         onClick={() => {
-                          toggleSaveImageMutataion.mutate();
-                          setCollected((prev) => !prev);
-                          openModal(<CollectionModal />, {});
+                          if (accessToken) {
+                            toggleSaveImageMutataion.mutate();
+                            setCollected((prev) => !prev);
+                            openModal(<CollectionModal />, {});
+                          } else {
+                            toast.warning("Login to collect photos");
+                          }
                         }}
                       >
                         {coillected ? (
@@ -484,8 +495,12 @@ const PhotoDetailsPage = () => {
                       <button
                         className="flex items-center mr-[7px] cursor-pointer text-[#2a2a2a] transition-all duration-300  hover:border-[gray] hover:bg-[#e9e9e9] rounded-lg border-[1px] border-[#e6e6e6] justify-center w-[110px] h-[40px]"
                         onClick={() => {
-                          toggleLikeImageMutataion.mutate();
-                          setLiked((prev) => !prev);
+                          if (accessToken) {
+                            toggleLikeImageMutataion.mutate();
+                            setLiked((prev) => !prev);
+                          } else {
+                            toast.warning("Login to like photos");
+                          }
                         }}
                       >
                         {liked ? (

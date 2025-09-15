@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import useAuth, { root_uri } from "@/utils/stores/aurhStore";
 import axios from "axios";
 import useImageStore from "@/utils/stores/imageStore";
+import { toast } from "sonner";
 
 const Photo: React.FC<IPhotoProps> = ({ photo, width, detail }) => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -56,29 +57,20 @@ const Photo: React.FC<IPhotoProps> = ({ photo, width, detail }) => {
       ? true
       : false;
 
- 
-
-const [imageHeight, setImageHeight] = useState(() => 
-  width * (photo.height / photo.width)
-);
-
- 
+  const [imageHeight, setImageHeight] = useState(
+    () => width * (photo.height / photo.width)
+  );
 
   // let src = photo.urls.thumb;
   // if (width > 200 && width <= 400) {
   // 	src = photo.urls.small;
   // }
 
- 
-
   useEffect(() => {
     if (detail) {
       setIsLoaded(true);
     }
   }, [detail]);
-
- 
-
 
   return (
     <div
@@ -105,8 +97,8 @@ const [imageHeight, setImageHeight] = useState(() =>
             : { viewTransitionName: "image-expand" }),
         }}
         onLoad={(e) => {
-          setIsLoaded((prev) => true); 
-          setImageHeight( e.target.offsetHeight );
+          setIsLoaded((prev) => true);
+          setImageHeight(e.target.offsetHeight);
         }}
         loading="lazy"
         className={`bg-tourqoise-200  top-0 left-0 rounded-lg center_img transition-all delay-100 duration-300 ${
@@ -116,9 +108,9 @@ const [imageHeight, setImageHeight] = useState(() =>
       {/* {imageHeight > 0 ? ( */}
 
       <div
-        className={`absolute top-0 left-0 w-full bg-transparent transition-all duration-300 h-[${ imageHeight }px]  group-hover:bg-[rgb(0,0,0,.4)] rounded-lg right-0`}
+        className={`absolute top-0 left-0 w-full bg-transparent transition-all duration-300 h-[${imageHeight}px]  group-hover:bg-[rgb(0,0,0,.4)] rounded-lg right-0`}
         style={{
-          height: `${ imageHeight }px`,
+          height: `${imageHeight}px`,
         }}
       >
         <div className="absolute top-[20px] left-[20px] w-[50px] flex items-center justify-center rounded-md h-[50px] bg-[rgb(0,0,0,.4)]">
@@ -187,14 +179,18 @@ const [imageHeight, setImageHeight] = useState(() =>
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                toggleLikeImageMutataion.mutate();
-                const dummy = [...photos];
-                const thisImage = dummy.find(function (el) {
-                  return el.pexai_id == photo.pexai_id;
-                });
-                dummy[dummy.indexOf(thisImage)].liked = !thisImage.liked;
-                setPhotos(dummy);
-                setLiked((prev) => !prev);
+                if (accessToken) {
+                  toggleLikeImageMutataion.mutate();
+                  const dummy = [...photos];
+                  const thisImage = dummy.find(function (el) {
+                    return el.pexai_id == photo.pexai_id;
+                  });
+                  dummy[dummy.indexOf(thisImage)].liked = !thisImage.liked;
+                  setPhotos(dummy);
+                  setLiked((prev) => !prev);
+                }else{
+                  toast.warning('Login to like photos')
+                }
               }}
             >
               <div

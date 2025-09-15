@@ -15,10 +15,16 @@ const RemixPage = () => {
 
   const { accessToken } = useAuth();
 
+   const useQueryParams = () => {
+      const { search } = useLocation();
+      return new URLSearchParams(search);
+    };
+    const query = useQueryParams();
+
   const getChatMutation = useMutation({
     mutationKey: ["chats", id],
     mutationFn: () => {
-      return axios.get(`${root_uri}/chats/${id}`, {
+      return axios.get(`${root_uri}/chats/${id}?cf=${ query.get('cf') || false }`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
