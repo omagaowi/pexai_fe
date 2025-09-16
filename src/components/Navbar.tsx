@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
+import Cookies from 'js-cookie'
 import {
+  ArrowLeft,
   Heart,
+  Key,
   Layers,
   LogOut,
   RotateCcw,
   Search,
   Shuffle,
+  Sparkles,
 } from "lucide-react";
 import useAuth from "@/utils/stores/aurhStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -19,9 +23,15 @@ import {
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import { useMutationState } from "@tanstack/react-query";
 import CircularLoader from "./LoaderCircular";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useFileUpload } from "@/utils/useFiles/fileUtils";
 
 const Navbar = () => {
-  const { accessToken, userData } = useAuth();
+  const { accessToken, userData, setAccessToken, setUserData, setClientSocket } = useAuth();
+  const { setFiles } = useFileUpload()
+
+  const navigate = useNavigate();
 
   const mutationKey = ["user"];
 
@@ -34,36 +44,64 @@ const Navbar = () => {
     }),
   });
 
+  const location = useLocation();
+  const useQueryParams = () => {
+    const { search } = useLocation();
+    return new URLSearchParams(search);
+  };
+  const query = useQueryParams();
+
+  const [search, setSearch] = useState(query.get("q"));
+
+  const [isSearch, setIsSearch] = useState(false)
+
+ 
+
   const userLatest =
     userMutationState.length > 0
       ? userMutationState[userMutationState.length - 1]
       : null;
 
-  console.log(userLatest?.status);
-
   return (
     <div className="w-full h-[80px] bg-[#fff] z-9999 fixed flex navbar justify-between items-center border-b-[1px] border-[#f2f2f2]">
-      <div className="w-[105px] ml-[15px]">
+      <Link to={`/`} className={`w-[105px] ml-[15px] ${ isSearch? 'max-[700px]:hidden' : '' } `}>
         <img src="/assets/logo/logo1.png" className="w-full" />
-      </div>
+      </Link>
+       <div className={`w-[50px] ${ !isSearch? 'hidden' : ' max-[700px]:flex' } h-[50px] hover:bg-[#dedcdc] rounded-lg hover:text-[#4e4e4e] text-[gray]   ml-[10px] hidden items-center justify-center bg-[#f5f5f5]`} onClick={ () => {
+        setIsSearch(false)
+       } }>
+            <ArrowLeft />
+        </div>
       <div className="flex-1 flex items-center justify-center h-full">
-        <div className="max-w-[540px] flex items-center h-[55px] rounded-lg nav-search bg-[#f5f5f5] w-[90%]">
+        <div className={`max-w-[540px] flex items-center h-[55px] ${ isSearch? 'max-[700px]:max-w-[700px]' : 'max-[700px]:hidden' }  rounded-lg nav-search bg-[#f5f5f5] w-[97%]`}>
           {/* <div className="w-[50px] flex items-center justify-center h-[50px] mx-[5px] rounded-lg bg-[#fff] shadow-xsm">
                         <Search className="text-[#4c4c4c]"/>
                     </div> */}
-          <div className="flex-1 flex ml-[20px] items-center h-full">
+          <form
+            className="flex-1 flex ml-[20px] items-center h-full"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (search) {
+                navigate(`/search?q=${search}`);
+              }
+            }}
+          >
             <input
               type="text"
               placeholder="Search pexai for photos ...."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
               className="w-full placeholder:text-[#9a9a9a] h-full placeholder:text-[17px] outline-none"
             />
             <button className="w-[50px] transition-all ease-in-out  cursor-pointer duration-200 hover:bg-[#dedcdc] rounded-lg hover:text-[#4e4e4e] flex mr-[10px] items-center justify-center text-[gray] h-[44px]">
               <Search />
             </button>
-          </div>
+          </form>
         </div>
       </div>
-      <div className="w-[200px] flex flex-row-reverse cursor-pointer mr-[20px] items-center h-full">
+      <div className="w-[120px] flex flex-row-reverse cursor-pointer mr-[20px] items-center h-full">
         {accessToken ? (
           <DropdownMenu>
             <DropdownMenuTrigger className="outline-none">
@@ -71,9 +109,9 @@ const Navbar = () => {
                 <Avatar>
                   <AvatarImage src="" />
                   <AvatarFallback>
-                    {userData ? (
-                      `${userData.first_name.split("")[0]}${
-                        userData.last_name.split("")[0]
+                    {userData && userData.first_name && userData.last_name ? (
+                      `${userData?.first_name?.split("")[0]}${
+                        userData?.last_name?.split("")[0]
                       }`
                     ) : (
                       <>
@@ -110,24 +148,48 @@ const Navbar = () => {
                 <>
                   <div className="w-full flex-col">
                     <h3 className="font-semibold text-[#333333] mt-[10px] ml-[10px]">
-                      Omaga David
+                      { userData?.first_name } { userData?.last_name }
                     </h3>
                     <p className="font-semibold text-[#818181] text-[11px] ml-[10px]">
-                      omagadvd@gmail.com
+                     { userData?.email }
                     </p>
                   </div>
                   <ul className="w-full flex flex-col items-center mt-[15px]">
-                    <li className="w-[95%] h-[43px] rounded-md my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center">
+                    <li
+                      className="w-[95%] h-[43px] rounded-md my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center"
+                      onClick={() => {
+                        navigate(`/remixes`);
+                      }}
+                    >
                       <Shuffle size={19} className="mx-[10px]" />
                       <p className="text-[13px]">My Remixes</p>
                     </li>
-                    <li className="w-[95%] h-[43px] rounded-md  my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center">
+                    <li
+                      className="w-[95%] h-[43px] rounded-md  my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center"
+                      onClick={() => {
+                        navigate(`/collections`);
+                      }}
+                    >
                       <Layers size={19} className="mx-[10px]" />
                       <p className="text-[13px]">My Collections</p>
                     </li>
-                    <li className="w-[95%] h-[43px] rounded-md  my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center">
+                    <li
+                      className="w-[95%] h-[43px] rounded-md  my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center"
+                      onClick={() => {
+                        navigate(`/likes`);
+                      }}
+                    >
                       <Heart size={19} className="mx-[10px]" />
                       <p className="text-[13px]">Liked Photos</p>
+                    </li>
+                    <li
+                      className="w-[95%] h-[43px] rounded-md  my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center"
+                      onClick={() => {
+                        navigate(`/auth/options?s=byok`);
+                      }}
+                    >
+                      <Key size={19} className="mx-[10px]" />
+                      <p className="text-[13px]">API Key (BYOK)</p>
                     </li>
                   </ul>
                 </>
@@ -146,14 +208,40 @@ const Navbar = () => {
                   ) : (
                     <>
                       <h2 className="font-bold">An Error Occured</h2>
-                      <p className="text-[11px]">{userLatest?.error.response?.data}</p>
+                      <p className="text-[11px]">
+                        {userLatest?.error.response?.data}
+                      </p>
                     </>
                   )}
                 </div>
               )}
               <div className="w-[98%] mt-[6px] h-[1px] bg-[#d3d1d1]"></div>
               <ul className="w-full flex flex-col items-center mt-[4px]">
-                <li className="w-[95%] h-[43px] rounded-md my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center">
+                {userLatest?.status != "success" ||
+                userLatest?.data?.data?.membership_status == "active" ? (
+                  <></>
+                ) : (
+                  <li
+                    className="w-[95%] h-[43px] rounded-md my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center"
+                    onClick={() => {
+                      navigate("/auth/options");
+                    }}
+                  >
+                    <Sparkles size={19} className="mx-[10px]" />
+                    <p className="text-[13px]">Upgrade</p>
+                  </li>
+                )}
+
+                <li className="w-[95%] h-[43px] rounded-md my-[4px] transition-all duration-200 cursor-pointer hover:bg-[#e8e7e7] font-semibold text-[#101828] flex items-center" onClick={ () => {
+                  setAccessToken(false)
+                  setUserData(false)
+                  toast.success('Logged out!')
+                  navigate('/auth/signin')
+                  localStorage.removeItem('key')
+                  Cookies.remove('accessToken')
+                  setFiles([])
+                  
+                } }>
                   <LogOut size={19} className="mx-[10px]" />
                   <p className="text-[13px]">Log out</p>
                 </li>
@@ -161,10 +249,17 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button className="w-[90px] cursor-pointer text-[14px] h-[40px]">
+          <Button className="w-[90px] cursor-pointer text-[14px] h-[40px]" onClick={ () => {
+            navigate('/auth/signin')
+          } }>
             Sign in
           </Button>
         )}
+        <div className={`w-[50px] ${ isSearch? 'hidden' : ' max-[700px]:flex' } h-[50px] hover:bg-[#dedcdc] rounded-lg hover:text-[#4e4e4e] text-[gray]   mr-[10px] hidden items-center justify-center bg-[#f5f5f5]`} onClick={ () => {
+          setIsSearch(true)
+        } }>
+            <Search />
+        </div>
       </div>
     </div>
   );

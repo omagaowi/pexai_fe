@@ -23,7 +23,7 @@ export const NewCollectionModal = ({ allCollections }) => {
     mutationKey: ["new_collection"],
     mutationFn: (e: FormEvent) => {
       return axios.post(
-        `${root_uri}/collections/new?newPhoto=${activeImage.pexai_id}`,
+        `${root_uri}/collections/new?newPhoto=${activeImage.pexai_id}&thumbnail=${ activeImage.src.large }`,
         {
           name: (e.target as HTMLFormElement).collection_name.value,
         },

@@ -16,66 +16,111 @@ import axios from "axios";
 import GridLoading from "./GridLoading";
 import CircularLoader from "./LoaderCircular";
 import useAuth, { root_uri } from "@/utils/stores/aurhStore";
+import useImageStore from "@/utils/stores/imageStore";
+import { Button } from "./ui/button";
 
 interface CentralGridProps {
-  url: string;
-  parent: any
+  appPage: string;
+  mutationKey: Array<string>;
+  api_url: string;
+  parent: any;
 }
 
-const CentralGrid: React.FC<CentralGridProps> = ({ url, parent }) => {
+function filterDuplicates<T>(array: T[], field: keyof T): T[] {
+  const seen = new Set();
+  return array.filter((item) => {
+    const value = item[field];
+    if (seen.has(value)) {
+      return false;
+    }
+    seen.add(value);
+    return true;
+  });
+}
+
+const CentralGrid: React.FC<CentralGridProps> = ({
+  api_url,
+  appPage,
+  mutationKey,
+  parent,
+}) => {
   const { width } = useViewDimensions();
   const appContainerRef = parent;
   const { containerSize } = useContainerSize(appContainerRef);
   const [scrollPosition, setScrollPosition] = useState<number>(0);
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(10);
 
   const location = useLocation();
 
-  const { accessToken } = useAuth()
+  const { accessToken } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState<string>("old garden");
 
   const queryClient = useQueryClient();
 
-  const mutationKey = ["images", "home"];
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [photos, setPhotos] = useState([]);
-  const [nextLoading, setNextLoading] = useState(false)
+  const { photos, setPhotos } = useImageStore();
+  const [nextLoading, setNextLoading] = useState(false);
 
-  console.log(photos)
+  const useQueryParams = () => {
+    const { search } = useLocation();
+    return new URLSearchParams(search);
+  };
+  const query = useQueryParams();
 
   const getAllImagesMutation = useMutation({
     mutationKey: mutationKey,
     mutationFn: (page_no: number) => {
-      return axios.get(`${ root_uri }/images/all?page=${ 1 }`, {
+      const uri = appPage.includes("search")
+        ? `${api_url}&page=${page_no}`
+        : `${api_url}?page=${page_no}`;
+
+      return axios.get(uri, {
         headers: {
-          'Authorization': `Bearer ${ accessToken }`
-        }
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
     },
     onSuccess: (data) => {
-      setPhotos([...photos, ...data.data]);
+      const fetchedPhotos =
+        appPage == "collection" ||
+        appPage == "likes" ||
+        appPage.includes("remixes")
+          ? data.data.allPhotos
+          : data.data;
+      if (
+        appPage == "remixes" ||
+        appPage == "collection" ||
+        appPage == "likes"
+      ) {
+        setTotalItems(data.data.total || 10);
+      } else {
+        setTotalItems(8000);
+      }
+      setPhotos(filterDuplicates([...photos, ...fetchedPhotos], "pexai_id"));
       setIsLoading(false);
-      setNextLoading(false)
-      setPage(prev => prev + 1)
+      setNextLoading(false);
+      setPage((prev) => prev + 1);
     },
     onError: (error) => {
- 
+      setIsLoading(false);
+      if (photos.length > 0) {
+        setPage((prev) => prev + 1);
+      }
+
+      setNextLoading(false);
       // setIsLoading(true)
     },
   });
 
- 
-
-  const fetchMorePhotos = (page_no : number) => {
-    // console.log('next')
-    if(photos.length > 0){
-    setNextLoading(true)
+  const fetchMorePhotos = (page_no: number) => {
+    if (photos.length > 0) {
+      setNextLoading(true);
     }
-    console.log('fetch')
-    getAllImagesMutation.mutate(page);
+
+    getAllImagesMutation.mutate(page_no);
   };
 
   // const { photos, isLoading, error, fetchMorePhotos } = usePhotoFetching(
@@ -96,26 +141,34 @@ const CentralGrid: React.FC<CentralGridProps> = ({ url, parent }) => {
     [searchQuery, setScrollPosition]
   );
 
+  useEffect(() => {
+    setIsLoading(true);
+    setPhotos([]);
+    setPage((prev) => 1);
+    fetchMorePhotos(page);
+  }, [location]);
+
   const handleScroll = useCallback(() => {
- 
     if (appContainerRef.current) {
- 
       const { scrollTop, scrollHeight, clientHeight } = appContainerRef.current;
       setScrollPosition(scrollTop);
       if (
         scrollHeight - scrollTop - clientHeight < clientHeight * 0.5 &&
         !nextLoading
       ) {
-        console.log('load')
-        fetchMorePhotos(page);
+        if (photos.length < totalItems) {
+          if (photos.length == 0 && getAllImagesMutation.status == "error") {
+          } else {
+            fetchMorePhotos(page);
+          }
+        }
       }
     }
-  }, [isLoading, fetchMorePhotos, location.pathname]);
+  }, [isLoading, fetchMorePhotos, location]);
 
   useEffect(() => {
     const appContainer = appContainerRef.current;
     if (appContainer) {
- 
       appContainer.addEventListener("scroll", handleScroll);
       return () => appContainer.removeEventListener("scroll", handleScroll);
     }
@@ -124,49 +177,80 @@ const CentralGrid: React.FC<CentralGridProps> = ({ url, parent }) => {
   useEffect(() => {
     if (appContainerRef.current) {
       // if (location.pathname === "/")
-        appContainerRef.current.scrollTop = scrollPosition;
+      appContainerRef.current.scrollTop = scrollPosition;
     }
   }, [location]);
+
+  useEffect(() => {
+    setPhotos([]);
+  }, []);
+
 
  
 
   return (
     <div className="w-full h-fit min-h-[100vh]">
-      {
-      photos.length == 0? (
-         <div className="w-full h-fit flex justify-center px-[30px] min-h-[100vh]">
-          <GridLoading  columns={ width > 830 ? 3 : width > 570? 2 : 1 }/>
-       </div>
-      ):(
+      {photos.length == 0 ? (
+        <>
+          {getAllImagesMutation.status == "pending" ? (
+            <div className="w-full h-fit flex justify-center px-[30px] min-h-[100vh]">
+              <GridLoading columns={width > 830 ? 3 : width > 570 ? 2 : 1} />
+            </div>
+          ) : (
+            <>
+              {getAllImagesMutation.status == "error" ? (
+                <div className="w-full h-fit flex items-center flex-col justify-center px-[30px] min-h-[100vh]">
+                  An Error Occured
+                  <Button
+                    className="w-[90px] cursor-pointer mt-[10px] text-[14px] h-[40px]"
+                    onClick={() => {
+                      getAllImagesMutation.mutate();
+                    }}
+                  >
+                    Retry
+                  </Button>
+                </div>
+              ) : (
+                <div className="w-full h-fit flex items-center flex-col justify-center px-[30px] min-h-[100vh]">
+                  Nothing to see here
+                </div>
+              )}
+            </>
+          )}
+        </>
+      ) : (
         <></>
-      )
-      }
+      )}
       <MasonryGrid
         photos={photos}
-        columns={ width > 830 ? 3 : width > 570? 2 : 1 }
+        columns={width > 830 ? 3 : width > 570 ? 2 : 1}
         minColumnWidth={180}
         cellGap={0}
         overscanCount={2}
         containerSize={containerSize}
         scrollTop={scrollPosition}
         onNeedMore={() => {
-          if(!nextLoading){
-            fetchMorePhotos(1)
+          if (!nextLoading) {
+            fetchMorePhotos(1);
           }
-          // console.log('next')
+
           //  setIsLoading(true)
         }}
         isLoading={isLoading}
       />
-      {
-       nextLoading?(
-          <div className="w-full h-[70px] flex items-center justify-center">
-              <CircularLoader size={50} bgColor="#fff" strokeWidth={2} color="#000" duration={2} />
-          </div>
-        ):(
-          <></>
-        )
-      }
+      {nextLoading ? (
+        <div className="w-full h-[70px] flex items-center justify-center">
+          <CircularLoader
+            size={50}
+            bgColor="#fff"
+            strokeWidth={2}
+            color="#000"
+            duration={2}
+          />
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

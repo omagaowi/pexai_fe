@@ -25,6 +25,8 @@ export interface IPhoto {
   };
   alt: string;
   saved: boolean;
+  status: string;
+  liked: boolean;
 }
 
 export interface IMasonryGridProps {

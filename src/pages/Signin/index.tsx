@@ -47,7 +47,7 @@ const SigninPage = () => {
     mutationKey: ["signInKey"],
     mutationFn: () => {
       return axios.get(
-        `${root_uri}/api/v1/auth/signin?code=${query.get("code")}`
+        `${root_uri}/auth/signin?code=${query.get("code")}`
       );
     },
     onSuccess: (data) => {
@@ -55,7 +55,13 @@ const SigninPage = () => {
        Cookies.set('accessToken', data.data.token, { expires: 28 })
        const { token, ...user } = {...data.data }
       setUserData(user)
-      navigate(`/`)
+ 
+      if(user.membership_status == 'active'){
+        navigate(`/`)
+      }else{
+        navigate('/auth/options')
+      }
+      
     }
   });
 
@@ -114,7 +120,9 @@ const SigninPage = () => {
           </div>
         ) : (
           <div className="w-full h-full pl-[20px]">
-            <img src="/assets/logo/logo1.png" className="w-[110px] mt-[30px]" />
+            <img src="/assets/logo/logo1.png" className="w-[110px] cursor-pointer mt-[30px]" onClick={ () => {
+              navigate('/')
+            } }/>
             <div className="mt-[30px]">
               <h2 className="font-bold">Sign in</h2>
               <p className="text-[15px] text-[#6b6b6b]">
