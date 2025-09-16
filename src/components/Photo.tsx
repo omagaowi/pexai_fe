@@ -122,7 +122,7 @@ const Photo: React.FC<IPhotoProps> = ({ photo, width, detail }) => {
                 ? "unph"
                 : photo.origin == "frepk"
                 ? "frepk"
-                : ""
+                : photo.origin == 'pexai'? "logo1_mini" : ""
             }.png`}
             className="w-[60%]"
             alt=""

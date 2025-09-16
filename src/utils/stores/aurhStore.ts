@@ -1,4 +1,5 @@
 const root_uri = import.meta.env.VITE_ROOT_URI;
+const socket_uri = import.meta.env.VITE_SOCKET_URI;
 
 import { create } from "zustand";
 import { UserObject } from "../types";
@@ -32,4 +33,4 @@ const useAuth = create<AuthStore>((set) => ({
 
 export default useAuth;
 
-export { root_uri };
+export { root_uri, socket_uri };

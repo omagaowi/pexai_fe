@@ -10,7 +10,7 @@ import PhotoDetailsPage from "./pages/PhotoDetails";
 import SigninPage from "./pages/Signin";
 import { toast, Toaster, useSonner } from "sonner";
 import axios from "axios";
-import useAuth, { root_uri } from "./utils/stores/aurhStore";
+import useAuth, { root_uri, socket_uri } from "./utils/stores/aurhStore";
 import Modal from "./components/Modal";
 import AllCollectionsPage from "./pages/AllCollections";
 import ViewCollectionPage from "./pages/ViewCollection";
@@ -170,7 +170,7 @@ function App() {
     }
 
     if (!clientSocket && accessToken) {
-      const thisSocket = io("http://localhost:4000", {
+      const thisSocket = io(socket_uri, {
         auth: {
           token: accessToken,
         },

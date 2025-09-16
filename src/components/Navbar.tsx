@@ -148,10 +148,10 @@ const Navbar = () => {
                 <>
                   <div className="w-full flex-col">
                     <h3 className="font-semibold text-[#333333] mt-[10px] ml-[10px]">
-                      Omaga David
+                      { userData?.first_name } { userData?.last_name }
                     </h3>
                     <p className="font-semibold text-[#818181] text-[11px] ml-[10px]">
-                      omagadvd@gmail.com
+                     { userData?.email }
                     </p>
                   </div>
                   <ul className="w-full flex flex-col items-center mt-[15px]">
