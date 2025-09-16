@@ -161,7 +161,6 @@ const SelectedImages = () => {
         toast.dismiss(alert.chat_id)
       }else{
         toast.loading("Image generation in progress", {
-        description: "click for more details",
         id: alert.chat_id,
         position: 'bottom-left',
         duration: Infinity
