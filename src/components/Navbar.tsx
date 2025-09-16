@@ -67,7 +67,7 @@ const Navbar = () => {
       <Link to={`/`} className={`w-[105px] ml-[15px] ${ isSearch? 'max-[700px]:hidden' : '' } `}>
         <img src="/assets/logo/logo1.png" className="w-full" />
       </Link>
-       <div className={`w-[50px] ${ !isSearch? 'hidden' : ' max-[700px]:flex' } h-[50px] hover:bg-[#dedcdc] rounded-lg hover:text-[#4e4e4e] text-[gray]   ml-[10px] hidden items-center justify-center bg-[#f5f5f5]`} onClick={ () => {
+       <div className={`w-[50px]  ${ !isSearch? 'hidden' : ' max-[700px]:flex' } h-[50px] hover:bg-[#dedcdc] rounded-lg hover:text-[#4e4e4e] text-[gray]   ml-[10px] hidden items-center justify-center bg-[#f5f5f5]`} onClick={ () => {
         setIsSearch(false)
        } }>
             <ArrowLeft />
@@ -95,7 +95,7 @@ const Navbar = () => {
               }}
               className="w-full placeholder:text-[#9a9a9a] h-full placeholder:text-[17px] outline-none"
             />
-            <button className="w-[50px] transition-all ease-in-out  cursor-pointer duration-200 hover:bg-[#dedcdc] rounded-lg hover:text-[#4e4e4e] flex mr-[10px] items-center justify-center text-[gray] h-[44px]">
+            <button className="w-[50px]  transition-all ease-in-out  cursor-pointer duration-200 hover:bg-[#dedcdc] rounded-lg hover:text-[#4e4e4e] flex mr-[10px] items-center justify-center text-[gray] h-[44px]">
               <Search />
             </button>
           </form>
@@ -255,7 +255,7 @@ const Navbar = () => {
             Sign in
           </Button>
         )}
-        <div className={`w-[50px] ${ isSearch? 'hidden' : ' max-[700px]:flex' } h-[50px] hover:bg-[#dedcdc] rounded-lg hover:text-[#4e4e4e] text-[gray]   mr-[10px] hidden items-center justify-center bg-[#f5f5f5]`} onClick={ () => {
+        <div className={`w-[50px] shrink-0 ${ isSearch? 'hidden' : ' max-[700px]:flex' } h-[50px] hover:bg-[#dedcdc] rounded-lg hover:text-[#4e4e4e] text-[gray]   mr-[10px] hidden items-center justify-center bg-[#f5f5f5]`} onClick={ () => {
           setIsSearch(true)
         } }>
             <Search />

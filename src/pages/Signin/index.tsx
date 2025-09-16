@@ -4,7 +4,7 @@ import handleError from "@/utils/handleErrors";
 import useAuth, { root_uri } from "@/utils/stores/aurhStore";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Cookies from 'js-cookie'
@@ -14,6 +14,8 @@ const SigninPage = () => {
     const { search } = useLocation();
     return new URLSearchParams(search);
   };
+
+  const [pending, setPending] = useState(false)
 
   const query = useQueryParams();
 
@@ -27,6 +29,7 @@ const SigninPage = () => {
       return axios.get(`${root_uri}/auth/google/signin`);
     },
     onSuccess: (data) => {
+      setPending(true)
       window.location.href = data.data.url;
     },
     onError: (error: any) => {
@@ -72,6 +75,7 @@ const SigninPage = () => {
   };
 
   useEffect(() => {
+    setPending(false)
     if (query.get("code")) {
       signinMutation.mutate();
     }
@@ -137,7 +141,7 @@ const SigninPage = () => {
                 fetchGoogleLink();
               }}
             >
-              {signinMutation.isPending ? (
+              {signinMutation.isPending || pending ? (
                 <>
                   <CircularLoader
                     size={21}

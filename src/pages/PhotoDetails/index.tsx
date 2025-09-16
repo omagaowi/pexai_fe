@@ -238,7 +238,7 @@ const PhotoDetailsPage = () => {
                     className={`${
                       orientation == "portrait"
                         ? `max-[830px]:max-w-[500px] shrink-0 max-[830px]:h-fit   w-fit h-[450px]`
-                        : `max-w-[550px] h-fit ml-[20px]`
+                        : `max-w-[550px] h-fit max-[830px]:ml-[0px] ml-[20px]`
                     } max-[830px]:w-[95vw]`}
                   >
                     <Photo
@@ -257,7 +257,7 @@ const PhotoDetailsPage = () => {
                   >
                     {activeImage.origin == "pexai" ? (
                       <>
-                        <div className="w-full flex flex-wrap">
+                        <div className="w-full flex  max-[830px]: mt-[20px] flex-wrap">
                           {activeImage.original_photos.map((photo) => (
                             <div
                               className="w-[60px] h-[60px] relative mr-[10px] bg-[gray] rounded-lg cursor-pointer"
@@ -283,7 +283,7 @@ const PhotoDetailsPage = () => {
                         </div>
                         <div className="flex flex-col mt-[10px] max-[830px]:items-center">
                           <MessageSquare size={17} className="text-[gray]" />
-                          <h3 className="">
+                          <h3 className="max-[830px]:text-center">
                             {activeImage.prompt || (
                               <Link
                                 to={`/remix/${activeImage.chat_id}?cf=${activeImage?.message_id}`}
@@ -365,7 +365,7 @@ const PhotoDetailsPage = () => {
                       <>
                         <div className="flex flex-col max-[830px]:items-center">
                           <ClosedCaption className="text-[gray]" />
-                          <h3 className="">
+                          <h3 className="max-[830px]:text-center">
                             {activeImage.alt || "Pexels image with no caption"}
                           </h3>
                         </div>
@@ -546,8 +546,8 @@ const PhotoDetailsPage = () => {
                   </div>
                 </div>
                 {activeImage && activeImage.remixes > 0 ? (
-                  <div className="w-full  h-fit" ref={parentRef}>
-                    <h1 className="text-[27px] ml-[37px] mb-[10px] text-[#292929]">
+                  <div className="w-full  h-fit mb-[20px]" ref={parentRef}>
+                    <h1 className="text-[27px] max-[830px]:ml-0 ml-[37px] mb-[10px] max-[830px]:text-center text-[#292929]">
                       Remixes of this Photo
                     </h1>
                     <CentralGrid
