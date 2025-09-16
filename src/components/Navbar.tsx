@@ -101,7 +101,7 @@ const Navbar = () => {
           </form>
         </div>
       </div>
-      <div className="w-[120px] flex flex-row-reverse cursor-pointer mr-[20px] items-center h-full">
+      <div className={`w-[120px]  flex-row-reverse cursor-pointer mr-[20px] ${ isSearch? 'max-[500px]:hidden flex' : 'flex' } items-center h-full`}>
         {accessToken ? (
           <DropdownMenu>
             <DropdownMenuTrigger className="outline-none">
@@ -249,7 +249,7 @@ const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button className="w-[90px] cursor-pointer text-[14px] h-[40px]" onClick={ () => {
+          <Button className={`w-[90px] cursor-pointer text-[14px] ${ isSearch? 'max-[500px]:hidden' : '' } h-[40px]`} onClick={ () => {
             navigate('/auth/signin')
           } }>
             Sign in

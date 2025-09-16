@@ -157,7 +157,7 @@ const Photo: React.FC<IPhotoProps> = ({ photo, width, detail }) => {
           } h-[40px] overflow-hidden flex flex-col cursor-pointer ${
             isSelected
               ? "translate-y-0 opacity-100"
-              : "opacity-0 translate-y-[-30px] transition-all duration-300 group-hover:translate-y-[0] group-hover:opacity-100"
+              : "max-[700px]:opacity-100 max-[700px]:translate-y-[0] opacity-0 translate-y-[-30px] transition-all duration-300 group-hover:translate-y-[0] group-hover:opacity-100"
           }  rounded-full absolute top-[20px] right-[20px]`}
         >
           {/* <p className="text-[16px] text-[#080808]">Select</p> */}

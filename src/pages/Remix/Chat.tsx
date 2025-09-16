@@ -42,7 +42,7 @@ const Chat = () => {
         className={`w-full flex overflow-hidden relative`}
         style={{ height: "calc(100% - 100px)" }}
       >
-        <div className="w-full h-[60px] flex justify-between items-center bg-[#fff] z-9999 absolute top-0 left-0">
+        <div className="max-w-[700px] fixed w-[96vw] h-[60px] flex justify-between items-center bg-[#fff] z-9999 top-0">
            <Tooltip>
             <TooltipTrigger className="w-[40px]   h-[40px]">
               <button

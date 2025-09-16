@@ -152,11 +152,11 @@ const MessageBox = ({ active }) => {
 
   return (
     <div
-      className={`absolute bottom-[20px] ${
+      className={`max-w-[700px] fixed w-[96vw] bottom-[20px] ${
         !active
           ? "pointer-events-none"
           : "opacity-100 pointer-events-all"
-      } flex flex-col rounded-md border-[1px] bg-[#fff] border-[#f0f0f0] w-full transition-all duration-200 ${
+      } flex flex-col rounded-md border-[1px] bg-[#fff] border-[#f0f0f0] transition-all duration-200 ${
         files.length > 0 ? "h-[150px]" : "h-[115px] pt-[7px]"
       }  shadow-sm`}
     >
