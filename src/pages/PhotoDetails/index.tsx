@@ -227,12 +227,12 @@ const PhotoDetailsPage = () => {
               <div className="w-full h-fit">
                 <div
                   className={`${
-                    orientation == "portrait" ? `` : ``
+                    orientation == "portrait" ? `max-[830px]:justify-start` : `max-[830px]:justify-center`
                   } max-[830px]:mt-[40px] flex w-full ${
                     activeImage && activeImage.remixes > 0
                       ? " min-h-[86vh]"
                       : "min-h-screen"
-                  } h-fit flex-row  max-[830px]:flex-col items-center justify-center max-[830px]:justify-start`}
+                  } h-fit flex-row  max-[830px]:flex-col items-center justify-center`}
                 >
                   <div
                     className={`${
