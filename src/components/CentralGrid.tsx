@@ -76,7 +76,7 @@ const CentralGrid: React.FC<CentralGridProps> = ({
       const uri = appPage.includes("search")
         ? `${api_url}&page=${page_no}`
         : `${api_url}?page=${page_no}`;
-
+      console.log(uri)
       return axios.get(uri, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -145,7 +145,8 @@ const CentralGrid: React.FC<CentralGridProps> = ({
     setIsLoading(true);
     setPhotos([]);
     setPage((prev) => 1);
-    fetchMorePhotos(page);
+    console.log('log', page)
+    fetchMorePhotos(1);
   }, [location]);
 
   const handleScroll = useCallback(() => {
