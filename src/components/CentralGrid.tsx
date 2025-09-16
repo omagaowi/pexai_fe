@@ -157,7 +157,7 @@ const CentralGrid: React.FC<CentralGridProps> = ({
         !nextLoading
       ) {
         if (photos.length < totalItems) {
-          if (photos.length == 0 && getAllImagesMutation.status == "error") {
+          if ((photos.length == 0 && getAllImagesMutation.status == "error") || (photos.length == 0 && getAllImagesMutation.status == "success")) {
           } else {
             fetchMorePhotos(page);
           }
