@@ -2,12 +2,13 @@ import { IPhotoProps } from "@/utils/types";
 import React, { useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { useFileUpload } from "@/utils/useFiles/fileUtils";
-import { Check, CheckCircle, Heart } from "lucide-react";
+import { Check, CheckCircle, Heart, Shuffle } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import useAuth, { root_uri } from "@/utils/stores/aurhStore";
 import axios from "axios";
 import useImageStore from "@/utils/stores/imageStore";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const Photo: React.FC<IPhotoProps> = ({ photo, width, detail }) => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -18,6 +19,8 @@ const Photo: React.FC<IPhotoProps> = ({ photo, width, detail }) => {
   const { photos, setPhotos } = useImageStore();
 
   const { accessToken } = useAuth();
+
+  const navigate = useNavigate();
 
   const toggleLikeImageMutataion = useMutation({
     mutationKey: ["collection", "like"],
@@ -122,7 +125,9 @@ const Photo: React.FC<IPhotoProps> = ({ photo, width, detail }) => {
                 ? "unph"
                 : photo.origin == "frepk"
                 ? "frepk"
-                : photo.origin == 'pexai'? "logo1_mini" : ""
+                : photo.origin == "pexai"
+                ? "logo1_mini"
+                : ""
             }.png`}
             className="w-[60%]"
             alt=""
@@ -188,8 +193,8 @@ const Photo: React.FC<IPhotoProps> = ({ photo, width, detail }) => {
                   dummy[dummy.indexOf(thisImage)].liked = !thisImage.liked;
                   setPhotos(dummy);
                   setLiked((prev) => !prev);
-                }else{
-                  toast.warning('Login to like photos')
+                } else {
+                  toast.warning("Login to like photos");
                 }
               }}
             >
@@ -223,6 +228,50 @@ const Photo: React.FC<IPhotoProps> = ({ photo, width, detail }) => {
                     d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"
                   />
                 </svg>
+              </div>
+            </div>
+            <div
+              style={{
+                background: isSelected ? `#fff` : `rgba(255, 255, 255, .5)`,
+                backdropFilter: `blur(7px)`,
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (accessToken) {
+                  const newFile = {
+                    file: false,
+                    status: "uploaded",
+                    error: false,
+                    url: photo.src.large,
+                    upload_id: "",
+                    file_id: photo.pexai_id,
+                    other: false,
+                    thumbnail_url: photo.src.small || photo.src.original,
+                  };
+                  if (!isSelected) {
+                    addFile(newFile);
+                    setTimeout(() => {
+                      navigate("/remix");
+                    }, 500);
+                  } else {
+                    navigate("/remix");
+                  }
+                } else {
+                  toast.warning('login to access remix')
+                  navigate("/auth/signin");
+                }
+              }}
+              className={`w-[110px]  h-[40px] overflow-hidden flex flex-col cursor-pointer 
+             transition-all duration-300 ${
+               detail ? "opacity-0" : "opacity-100"
+             } group-hover:translate-y-[0] group-hover:opacity-100
+            rounded-full absolute bottom-[20px] left-[20px]`}
+            >
+              {/* <p className="text-[16px] text-[#080808]">Select</p> */}
+              <div className="w-full h-full flex shrink-0 items-center justify-center ">
+                <Shuffle size={15} className="mr-[7px]" />
+                <p className="text-[16px] text-[#080808]">Remix</p>
               </div>
             </div>
             {/* <div className="absolute bottom-[20px] delay-100 transition-all duration-200 translate-y-[30px] opacity-0 group-hover:opacity-100 group-hover:translate-y-0 right-[90px] w-[50px] flex items-center justify-center rounded-md h-[50px] bg-[rgb(0,0,0,.4)]">

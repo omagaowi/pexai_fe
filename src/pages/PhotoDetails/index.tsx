@@ -227,7 +227,9 @@ const PhotoDetailsPage = () => {
               <div className="w-full h-fit">
                 <div
                   className={`${
-                    orientation == "portrait" ? `max-[830px]:justify-start` : `max-[830px]:justify-center`
+                    orientation == "portrait"
+                      ? `max-[830px]:justify-start`
+                      : `max-[830px]:justify-center`
                   } max-[830px]:mt-[40px] flex w-full ${
                     activeImage && activeImage.remixes > 0
                       ? " min-h-[86vh]"
@@ -428,13 +430,13 @@ const PhotoDetailsPage = () => {
                             ) {
                               addFile(newFile);
                             }
+                            setTimeout(() => {
+                              navigate(`/remix`);
+                            }, 300);
                           } else {
                             toast.warning("login to access remix");
+                            navigate("/auth/signin");
                           }
-
-                          setTimeout(() => {
-                            navigate(`/remix`);
-                          }, 300);
                         }}
                       >
                         <Shuffle size={16} className="mr-[7px]" /> Remix

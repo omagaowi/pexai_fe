@@ -9,12 +9,13 @@ import CircularProgressBar from "./ui/CircularLoader";
 import CircularLoader from "./LoaderCircular";
 import { toast } from "sonner";
 import useRemixStore from "@/utils/stores/remixStore";
+import useAuth from "@/utils/stores/aurhStore";
 
 const SeletectedImage = ({ image }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const { removeFile, setFiles, getProgress } = useFileUpload();
 
-  const { id } = useParams()
+  const { id } = useParams();
 
   useEffect(() => {
     if (image.status == "error") {
@@ -108,9 +109,11 @@ const SelectedImages = () => {
 
   const clickOutRef = useRef<HTMLDivElement>(null);
 
-  const { alerts } = useRemixStore()
+  const { accessToken } = useAuth();
 
-  const navigate = useNavigate()
+  const { alerts } = useRemixStore();
+
+  const navigate = useNavigate();
 
   const handleClickOut = (event) => {
     if (clickOutRef.current && !clickOutRef.current.contains(event.target)) {
@@ -132,42 +135,42 @@ const SelectedImages = () => {
       }
     } else {
       setIsOpen(true);
-      if(location.pathname.includes('auth')){
-          setIsOpen(false)
+      if (location.pathname.includes("auth")) {
+        setIsOpen(false);
       }
       if (location.pathname.includes("remix")) {
-        if(location.pathname.includes("remixes")){
-          setIsOpen(true)
-        }else{
-          setIsOpen(false)
+        if (location.pathname.includes("remixes")) {
+          setIsOpen(true);
+        } else {
+          setIsOpen(false);
         }
       }
-      
     }
     if (isExpand) {
       setItems(files);
     } else {
-      setItems(
-        files.length > 2 ? files.slice(0, 2) : files
-      );
+      setItems(files.length > 2 ? files.slice(0, 2) : files);
     }
   }, [isExpand, files, location]);
-  
 
   useEffect(() => {
-//    // console.log(location.pathname.includes('remix') && location.pathname.includes())
-     alerts.forEach((alert) => {
-      if((location.pathname.includes('remix') && location.pathname.includes(alert.chat_id)) || location.pathname.includes('auth')){
-        toast.dismiss(alert.chat_id)
-      }else{
+    //    // console.log(location.pathname.includes('remix') && location.pathname.includes())
+    alerts.forEach((alert) => {
+      if (
+        (location.pathname.includes("remix") &&
+          location.pathname.includes(alert.chat_id)) ||
+        location.pathname.includes("auth")
+      ) {
+        toast.dismiss(alert.chat_id);
+      } else {
         toast.loading("Image generation in progress", {
-        id: alert.chat_id,
-        position: 'bottom-left',
-        duration: Infinity
-      });
+          id: alert.chat_id,
+          position: "bottom-left",
+          duration: Infinity,
+        });
       }
     });
-  }, [location, alerts])
+  }, [location, alerts]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOut);
@@ -261,16 +264,24 @@ const SelectedImages = () => {
               transition={{ duration: 0.3 }}
               className="w-[90px] ml-[5px] h-full flex items-center justify-center"
             >
-              <button className="w-[37px] h-[37px] flex border-none outline-none cursor-pointer items-center rounded-md justify-center hover:bg-[#e1e1e1] " onClick={ (e) => {
-                navigate('/remix')
-                e.stopPropagation()
-              } }>
+              <button
+                className="w-[37px] h-[37px] flex border-none outline-none cursor-pointer items-center rounded-md justify-center hover:bg-[#e1e1e1] "
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (accessToken) {
+                    navigate("/remix");
+                  } else {
+                    toast.warning("login to access remix");
+                    navigate("/auth/signin");
+                  }
+                }}
+              >
                 <Shuffle size={17} className="" />
               </button>
               <button
                 className="w-[37px] h-[37px] mx-[4px] flex border-none outline-none cursor-pointer items-center rounded-md justify-center hover:bg-[#e1e1e1] "
                 onClick={(e) => {
-                  e.stopPropagation()
+                  e.stopPropagation();
                   setFiles([]);
                 }}
               >
@@ -284,11 +295,19 @@ const SelectedImages = () => {
             isExpand ? "flex" : "hidden"
           } items-center mt-[15px] justify-center`}
         >
-          <button className="w-[110px] cursor-pointer h-[40px] flex items-center justify-center bg-[#1e1e1e] mx-[7px] rounded-2xl text-[#fff] text-[14px]" onClick={ (e) => {
-            e.stopPropagation()
-            setIsExpand(false)
-            navigate('/remix')
-          } }>
+          <button
+            className="w-[110px] cursor-pointer h-[40px] flex items-center justify-center bg-[#1e1e1e] mx-[7px] rounded-2xl text-[#fff] text-[14px]"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpand(false);
+              if (accessToken) {
+                navigate("/remix");
+              } else {
+                toast.warning("login to access remix");
+                navigate("/auth/signin");
+              }
+            }}
+          >
             <Shuffle size={16} className="mr-[7px]" /> Remix
           </button>
           <button
