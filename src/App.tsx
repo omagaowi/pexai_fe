@@ -28,6 +28,7 @@ import SearchPage from "./pages/Search";
 import RemixOptions from "./pages/Options";
 import { ModalContext } from "./contexts/ModalContext";
 import SubscriptionError from "./components/SubscriptionError";
+import WelcomeGuide from "./components/Guide";
 
 let onConnect;
 let handleImageAlerts;
@@ -213,6 +214,7 @@ function App() {
         <Modal />
         <Toaster />
         <SelectedImages />
+        <WelcomeGuide />
       </BrowserRouter>
       {/* </QueryClientProvider> */}
       <FileInput id={`files_input`} />
