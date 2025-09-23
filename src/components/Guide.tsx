@@ -27,7 +27,7 @@ const WelcomeGuide = () => {
       vid: "/assets/videos/guide2.mp4",
     },
     {
-      title: "Remix external iamges",
+      title: "Remix external images",
       sub: "pexai allows you to upload images from your device and add them to the mix",
       vid: "/assets/videos/guide3.mp4",
     },
